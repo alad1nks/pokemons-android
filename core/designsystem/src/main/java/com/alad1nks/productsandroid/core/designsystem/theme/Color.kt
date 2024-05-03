@@ -1,4 +1,4 @@
-package com.alad1nks.productsandroid.ui.theme
+package com.alad1nks.productsandroid.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 

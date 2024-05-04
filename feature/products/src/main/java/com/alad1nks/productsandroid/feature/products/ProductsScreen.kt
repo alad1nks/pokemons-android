@@ -10,5 +10,4 @@ internal fun ProductsRoute(
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
-
 }

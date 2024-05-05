@@ -18,8 +18,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -33,7 +33,7 @@ internal fun ProductsRoute(
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsState()
+    val uiState by viewModel.uiState.observeAsState(initial = ProductsUiState.Loading)
 
     ProductsScreen(
         onShowSnackbar = onShowSnackbar,
@@ -68,6 +68,9 @@ internal fun ProductsScreen(
             ProductsUiState.Loading -> {
 
             }
+            ProductsUiState.Error -> {
+
+            }
         }
     }
 }
@@ -79,10 +82,7 @@ internal fun ProductsTopBar(
 ) {
     TopAppBar(
         title = {
-            Text(
-                text = stringResource(R.string.products),
-                overflow = TextOverflow.Ellipsis
-            )
+            Text(stringResource(R.string.products))
         },
         modifier = modifier,
         actions = {
@@ -117,11 +117,23 @@ internal fun ProductList(
     ) {
         items(products) { product ->
             ListItem(
-                headlineContent = { Text(product.title) },
+                headlineContent = {
+                    Text(
+                        text = product.title,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 modifier = Modifier.clickable {
                     onClickItem(product.id)
                 },
-                supportingContent = { Text(product.description) },
+                supportingContent = {
+                    Text(
+                        text = product.description,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                },
                 trailingContent = { Text(product.price.toString()) },
                 leadingContent = {
                     Icon(

@@ -38,8 +38,11 @@ android {
 dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.okhttp.logging)
+    implementation(libs.retrofit.adapter.rxjava3)
     implementation(libs.retrofit.core)
     implementation(libs.retrofit.kotlin.serialization)
+    implementation(libs.rx.android)
+    implementation(libs.rx.java)
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)

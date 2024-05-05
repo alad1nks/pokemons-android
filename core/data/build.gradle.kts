@@ -35,8 +35,11 @@ android {
 
 dependencies {
 
+    implementation(libs.rx.android)
+    implementation(libs.rx.java)
     implementation(libs.hilt.android)
     implementation(project(":core:model"))
+    implementation(project(":core:network"))
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

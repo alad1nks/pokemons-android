@@ -1,5 +1,7 @@
 package com.alad1nks.productsandroid.core.data.di
 
+import com.alad1nks.productsandroid.core.data.repository.ProductsRepository
+import com.alad1nks.productsandroid.core.data.repository.ProductsRepositoryImpl
 import com.alad1nks.productsandroid.core.data.repository.UserDataRepository
 import com.alad1nks.productsandroid.core.data.repository.UserDataRepositoryImpl
 import dagger.Binds
@@ -13,5 +15,9 @@ import javax.inject.Singleton
 internal interface DataModule {
     @Singleton
     @Binds
-    fun bindUserDataRepository(userDataRepository: UserDataRepositoryImpl): UserDataRepository
+    fun bindUserDataRepository(repository: UserDataRepositoryImpl): UserDataRepository
+
+    @Singleton
+    @Binds
+    fun bindProductsRepository(repository: ProductsRepositoryImpl): ProductsRepository
 }

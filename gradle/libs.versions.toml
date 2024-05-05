@@ -12,11 +12,14 @@ kotlin = "1.9.23"
 kotlinxSerializationJson = "1.6.3"
 ksp = "1.9.23-1.0.19"
 lifecycleRuntimeKtx = "2.7.0"
+livedata = "1.6.7"
 material3 = "1.2.1"
 navigation = "2.7.7"
 okhttp = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationConverter = "1.0.0"
+rxAndroid = "3.0.2"
+rxJava = "3.1.8"
 ui = "1.6.7"
 jetbrainsKotlinJvm = "1.9.23"
 
@@ -30,6 +33,7 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "j
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigation" }
+androidx-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata", version.ref = "livedata" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "ui" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4", version.ref = "ui" }
@@ -42,7 +46,10 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 okhttp-logging = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "okhttp" }
 retrofit-core = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
+retrofit-adapter-rxjava3 = { group = "com.squareup.retrofit2", name = "adapter-rxjava3", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.jakewharton.retrofit", name = "retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationConverter" }
+rx-android = { group = "io.reactivex.rxjava3", name = "rxandroid", version.ref = "rxAndroid" }
+rx-java = { group = "io.reactivex.rxjava3", name = "rxjava", version.ref = "rxJava" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

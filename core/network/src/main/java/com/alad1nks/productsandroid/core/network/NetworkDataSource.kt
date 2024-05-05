@@ -1,7 +1,8 @@
 package com.alad1nks.productsandroid.core.network
 
 import com.alad1nks.productsandroid.core.network.model.ProductsResponse
+import io.reactivex.rxjava3.core.Single
 
 interface NetworkDataSource {
-    suspend fun getProducts(skip: Int, limit: Int): ProductsResponse
+    fun getProducts(skip: Int, limit: Int): Single<ProductsResponse>
 }

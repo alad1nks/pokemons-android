@@ -6,4 +6,5 @@
     <string name="products">Products</string>
     <string name="network_error_image">Network error image</string>
     <string name="try_again">Try again</string>
+    <string name="icon_app_theme">Icon according to app theme</string>
 </resources>

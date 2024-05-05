@@ -3,19 +3,25 @@ package com.alad1nks.productsandroid.feature.products
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.alad1nks.productsandroid.core.data.repository.ProductsRepository
+import com.alad1nks.productsandroid.core.data.repository.UserDataRepository
 import com.alad1nks.productsandroid.core.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
-    private val repository: ProductsRepository
+    private val repository: ProductsRepository,
+    private val userDataRepository: UserDataRepository
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
 
@@ -23,6 +29,8 @@ class ProductsViewModel @Inject constructor(
 
     private val _uiState: MutableLiveData<ProductsUiState> = MutableLiveData()
     val uiState: LiveData<ProductsUiState> = _uiState
+
+    val darkTheme: Flow<Boolean> = userDataRepository.userData.map { it.darkTheme }
 
     init {
         disposables.add(
@@ -76,6 +84,12 @@ class ProductsViewModel @Inject constructor(
                     { _ -> _uiState.value = ProductsUiState.Error }
                 )
         )
+    }
+
+    fun changeTheme() {
+        viewModelScope.launch {
+            userDataRepository.changeTheme()
+        }
     }
 
     override fun onCleared() {

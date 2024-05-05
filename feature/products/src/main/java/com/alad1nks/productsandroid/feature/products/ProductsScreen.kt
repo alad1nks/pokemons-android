@@ -3,7 +3,6 @@ package com.alad1nks.productsandroid.feature.products
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,6 +12,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Button
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
@@ -49,9 +51,11 @@ internal fun ProductsRoute(
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.observeAsState(initial = ProductsUiState.Loading)
+    val darkTheme by viewModel.darkTheme.collectAsState(initial = false)
 
     ProductsScreen(
-        onShowSnackbar = onShowSnackbar,
+        darkTheme = darkTheme,
+        onClickThemeIcon = { viewModel.changeTheme() },
         onClickItem = onClickItem,
         onScroll = { viewModel.loadMore(it) },
         onClickRefresh = { viewModel.load() },
@@ -62,7 +66,8 @@ internal fun ProductsRoute(
 
 @Composable
 internal fun ProductsScreen(
-    onShowSnackbar: suspend (String, String?) -> Boolean,
+    darkTheme: Boolean,
+    onClickThemeIcon: () -> Unit,
     onClickItem: (Int) -> Unit,
     onScroll: (Int) -> Unit,
     onClickRefresh: () -> Unit,
@@ -72,7 +77,10 @@ internal fun ProductsScreen(
     Scaffold(
         modifier = modifier,
         topBar = {
-            ProductsTopBar(Modifier)
+            ProductsTopBar(
+                darkTheme = darkTheme,
+                onClickThemeIcon = onClickThemeIcon
+            )
         }
     ) { padding ->
         when (uiState) {
@@ -90,6 +98,7 @@ internal fun ProductsScreen(
             }
             ProductsUiState.Error -> {
                 ProductsErrorScreen(
+                    darkTheme = darkTheme,
                     onClick = onClickRefresh,
                     modifier = Modifier
                         .padding(padding)
@@ -103,13 +112,23 @@ internal fun ProductsScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProductsTopBar(
-    modifier: Modifier
+    darkTheme: Boolean,
+    onClickThemeIcon: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     TopAppBar(
         title = {
             Text(stringResource(R.string.products))
         },
         modifier = modifier,
+        navigationIcon = {
+            IconButton(onClick = onClickThemeIcon) {
+                Icon(
+                    imageVector = if (darkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
+                    contentDescription = stringResource(R.string.icon_app_theme)
+                )
+            }
+        },
         actions = {
             IconButton(onClick = {  }) {
                 Icon(
@@ -181,16 +200,16 @@ internal fun ProductList(
 
 @Composable
 internal fun ProductsErrorScreen(
+    darkTheme: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val isSystemInDarkTheme = isSystemInDarkTheme()
-    val imageRes = if (isSystemInDarkTheme) {
-        R.drawable.network_error
+    val imageRes = if (darkTheme) {
+        R.drawable.network_error_dark
     } else {
         R.drawable.network_error
     }
-    val background = if (isSystemInDarkTheme) Color.Black else Color.White
+    val background = if (darkTheme) Color.Black else Color.White
     Column(
         modifier = modifier
             .background(background),

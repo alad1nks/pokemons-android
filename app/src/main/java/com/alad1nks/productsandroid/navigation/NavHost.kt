@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.alad1nks.productsandroid.feature.product.navigation.PRODUCT_ROUTE
+import com.alad1nks.productsandroid.feature.product.navigation.productScreen
 import com.alad1nks.productsandroid.feature.products.navigation.PRODUCTS_ROUTE
 import com.alad1nks.productsandroid.feature.products.navigation.productsScreen
 
@@ -19,6 +21,12 @@ fun NavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        productsScreen(onShowSnackbar)
+        productsScreen(
+            onShowSnackbar = onShowSnackbar,
+            onClickItem = {
+                navController.navigate(PRODUCT_ROUTE)
+            }
+        )
+        productScreen(onShowSnackbar)
     }
 }

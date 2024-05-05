@@ -7,9 +7,13 @@ import com.alad1nks.productsandroid.feature.products.ProductsRoute
 const val PRODUCTS_ROUTE = "products_route"
 
 fun NavGraphBuilder.productsScreen(
-    onShowSnackbar: suspend (String, String?) -> Boolean
+    onShowSnackbar: suspend (String, String?) -> Boolean,
+    onClickItem: (Int) -> Unit
 ) {
     composable(PRODUCTS_ROUTE) {
-        ProductsRoute(onShowSnackbar)
+        ProductsRoute(
+            onShowSnackbar = onShowSnackbar,
+            onClickItem = onClickItem
+        )
     }
 }

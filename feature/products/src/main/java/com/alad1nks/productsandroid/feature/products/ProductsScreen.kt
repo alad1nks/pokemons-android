@@ -1,5 +1,6 @@
 package com.alad1nks.productsandroid.feature.products
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -28,6 +29,7 @@ import com.alad1nks.productsandroid.core.model.Product
 @Composable
 internal fun ProductsRoute(
     onShowSnackbar: suspend (String, String?) -> Boolean,
+    onClickItem: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
@@ -35,6 +37,7 @@ internal fun ProductsRoute(
 
     ProductsScreen(
         onShowSnackbar = onShowSnackbar,
+        onClickItem = onClickItem,
         uiState = uiState,
         modifier = modifier
     )
@@ -43,6 +46,7 @@ internal fun ProductsRoute(
 @Composable
 internal fun ProductsScreen(
     onShowSnackbar: suspend (String, String?) -> Boolean,
+    onClickItem: (Int) -> Unit,
     uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
@@ -56,6 +60,7 @@ internal fun ProductsScreen(
             is ProductsUiState.Data -> {
                 ProductList(
                     products = uiState.products,
+                    onClickItem = onClickItem,
                     modifier = Modifier
                         .padding(padding)
                 )
@@ -104,6 +109,7 @@ internal fun ProductsTopBar(
 @Composable
 internal fun ProductList(
     products: List<Product>,
+    onClickItem: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -112,6 +118,9 @@ internal fun ProductList(
         items(products) { product ->
             ListItem(
                 headlineContent = { Text(product.title) },
+                modifier = Modifier.clickable {
+                    onClickItem(product.id)
+                },
                 supportingContent = { Text(product.description) },
                 trailingContent = { Text(product.price.toString()) },
                 leadingContent = {

@@ -14,17 +14,11 @@ class ProductsViewModel @Inject constructor() : ViewModel() {
             ProductsUiState.Data(
                 List(20) {
                     Product(
-                        id = it.toLong(),
+                        id = it,
                         title = "iPhone 9",
                         description = "An apple mobile which is nothing like apple",
                         price = 549,
-                        discountPercentage = 12.96,
-                        rating = 4.69,
-                        stock = 94,
-                        brand = "Apple",
-                        category = "smartphones",
-                        thumbnail = "https://cdn.dummyjson.com/product-images/1/thumbnail.jpg",
-                        images = emptyList()
+                        thumbnail = "https://cdn.dummyjson.com/product-images/1/thumbnail.jpg"
                     )
                 }
             )

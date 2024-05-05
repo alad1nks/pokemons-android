@@ -3,6 +3,7 @@ package com.alad1nks.productsandroid.feature.products
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -93,7 +94,6 @@ internal fun ProductsScreen(
                     modifier = Modifier
                         .padding(padding)
                         .fillMaxSize()
-                        .background(Color.White)
                 )
             }
         }
@@ -184,13 +184,21 @@ internal fun ProductsErrorScreen(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isSystemInDarkTheme = isSystemInDarkTheme()
+    val imageRes = if (isSystemInDarkTheme) {
+        R.drawable.network_error
+    } else {
+        R.drawable.network_error
+    }
+    val background = if (isSystemInDarkTheme) Color.Black else Color.White
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .background(background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Image(
-            painter = painterResource(R.drawable.network_error),
+            painter = painterResource(imageRes),
             contentDescription = stringResource(R.string.network_error_image)
         )
         Button(

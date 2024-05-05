@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.runtime.livedata)
+    implementation(libs.coil.compose)
     implementation(libs.rx.android)
     implementation(libs.rx.java)
     implementation(libs.hilt.android)

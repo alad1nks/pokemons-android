@@ -41,7 +41,7 @@ class ProductsViewModel @Inject constructor(
     }
 
 
-    private fun updateSearchQuery(query: String) {
+    fun updateSearchQuery(query: String) {
         searchQuerySubject.onNext(query)
     }
 

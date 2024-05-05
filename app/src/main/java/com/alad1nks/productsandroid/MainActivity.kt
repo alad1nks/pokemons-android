@@ -19,9 +19,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import com.alad1nks.productsandroid.MainActivityUiState.Loading
 import com.alad1nks.productsandroid.core.designsystem.theme.ProductsAndroidTheme
-import com.alad1nks.productsandroid.core.model.DarkTheme.DARK
-import com.alad1nks.productsandroid.core.model.DarkTheme.LIGHT
-import com.alad1nks.productsandroid.core.model.DarkTheme.SYSTEM
 import com.alad1nks.productsandroid.navigation.NavHost
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.onEach
@@ -69,9 +66,5 @@ private fun shouldUseDarkTheme(
     uiState: MainActivityUiState,
 ): Boolean = when (uiState) {
     Loading -> isSystemInDarkTheme()
-    is MainActivityUiState.Success -> when (uiState.userData.darkTheme) {
-        SYSTEM -> isSystemInDarkTheme()
-        LIGHT -> false
-        DARK -> true
-    }
+    is MainActivityUiState.Success -> uiState.userData.darkTheme
 }

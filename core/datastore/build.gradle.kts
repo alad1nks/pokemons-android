@@ -1,11 +1,12 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.hilt)
     kotlin("kapt")
 }
 
 android {
-    namespace = "com.alad1nks.productsandroid.core.data"
+    namespace = "com.alad1nks.productsandroid.core.datastore"
     compileSdk = 34
 
     defaultConfig {
@@ -35,12 +36,9 @@ android {
 
 dependencies {
 
-    implementation(libs.rx.android)
-    implementation(libs.rx.java)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.hilt.android)
     implementation(project(":core:model"))
-    implementation(project(":core:network"))
-    implementation(project(":core:datastore"))
     kapt(libs.hilt.android.compiler)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

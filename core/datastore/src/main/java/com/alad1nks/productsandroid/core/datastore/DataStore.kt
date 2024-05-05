@@ -1,9 +1,10 @@
-package com.alad1nks.productsandroid.core.data.repository
+package com.alad1nks.productsandroid.core.datastore
 
 import com.alad1nks.productsandroid.core.model.UserData
 import kotlinx.coroutines.flow.Flow
 
-interface UserDataRepository {
-    val userData: Flow<UserData>
+interface DataStore {
+    fun userPreferencesFlow(): Flow<UserData>
+
     suspend fun changeTheme()
 }

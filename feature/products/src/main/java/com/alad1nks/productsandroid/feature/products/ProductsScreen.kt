@@ -80,7 +80,7 @@ internal fun ProductsTopBar(
     TopAppBar(
         title = {
             Text(
-                text = "Products",
+                text = stringResource(R.string.products),
                 overflow = TextOverflow.Ellipsis
             )
         },

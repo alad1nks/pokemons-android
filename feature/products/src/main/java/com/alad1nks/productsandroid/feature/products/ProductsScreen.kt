@@ -1,6 +1,11 @@
 package com.alad1nks.productsandroid.feature.products
 
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -9,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,9 +27,12 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -44,6 +53,7 @@ internal fun ProductsRoute(
         onShowSnackbar = onShowSnackbar,
         onClickItem = onClickItem,
         onScroll = { viewModel.loadMore(it) },
+        onClickRefresh = { viewModel.load() },
         uiState = uiState,
         modifier = modifier
     )
@@ -54,6 +64,7 @@ internal fun ProductsScreen(
     onShowSnackbar: suspend (String, String?) -> Boolean,
     onClickItem: (Int) -> Unit,
     onScroll: (Int) -> Unit,
+    onClickRefresh: () -> Unit,
     uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
@@ -77,7 +88,13 @@ internal fun ProductsScreen(
 
             }
             ProductsUiState.Error -> {
-
+                ProductsErrorScreen(
+                    onClick = onClickRefresh,
+                    modifier = Modifier
+                        .padding(padding)
+                        .fillMaxSize()
+                        .background(Color.White)
+                )
             }
         }
     }
@@ -159,5 +176,26 @@ internal fun ProductList(
                 onScroll(products.size)
             }
         }
+    }
+}
+
+@Composable
+internal fun ProductsErrorScreen(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Image(
+            painter = painterResource(R.drawable.network_error),
+            contentDescription = stringResource(R.string.network_error_image)
+        )
+        Button(
+            onClick = onClick,
+            content = { Text(stringResource(R.string.try_again)) }
+        )
     }
 }

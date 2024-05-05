@@ -59,6 +59,25 @@ class ProductsViewModel @Inject constructor(
         )
     }
 
+    fun load() {
+        _uiState.value = ProductsUiState.Loading
+        disposables.add(
+            repository.getProducts()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { items ->
+                        val products = when (val state = uiState.value) {
+                            is ProductsUiState.Data -> state.products + items
+                            else -> items
+                        }
+                        _uiState.value = ProductsUiState.Data(products)
+                    },
+                    { _ -> _uiState.value = ProductsUiState.Error }
+                )
+        )
+    }
+
     override fun onCleared() {
         disposables.clear()
         super.onCleared()

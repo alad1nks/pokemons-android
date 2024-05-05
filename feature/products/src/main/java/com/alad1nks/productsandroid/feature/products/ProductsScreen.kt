@@ -4,7 +4,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -43,6 +43,7 @@ internal fun ProductsRoute(
     ProductsScreen(
         onShowSnackbar = onShowSnackbar,
         onClickItem = onClickItem,
+        onScroll = { viewModel.loadMore(it) },
         uiState = uiState,
         modifier = modifier
     )
@@ -52,6 +53,7 @@ internal fun ProductsRoute(
 internal fun ProductsScreen(
     onShowSnackbar: suspend (String, String?) -> Boolean,
     onClickItem: (Int) -> Unit,
+    onScroll: (Int) -> Unit,
     uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
@@ -66,6 +68,7 @@ internal fun ProductsScreen(
                 ProductList(
                     products = uiState.products,
                     onClickItem = onClickItem,
+                    onScroll = onScroll,
                     modifier = Modifier
                         .padding(padding)
                 )
@@ -106,7 +109,7 @@ internal fun ProductsTopBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
+            titleContentColor = MaterialTheme.colorScheme.primary
         )
     )
 }
@@ -115,12 +118,13 @@ internal fun ProductsTopBar(
 internal fun ProductList(
     products: List<Product>,
     onClickItem: (Int) -> Unit,
+    onScroll: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
         modifier = modifier
     ) {
-        items(products) { product ->
+        itemsIndexed(products) { index, product ->
             ListItem(
                 headlineContent = {
                     Text(
@@ -151,6 +155,9 @@ internal fun ProductList(
                     )
                 }
             )
+            if (index >= products.size - 1) {
+                onScroll(products.size)
+            }
         }
     }
 }

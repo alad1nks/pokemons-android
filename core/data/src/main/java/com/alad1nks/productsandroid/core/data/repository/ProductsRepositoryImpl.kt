@@ -10,8 +10,10 @@ import javax.inject.Inject
 class ProductsRepositoryImpl @Inject constructor(
     private val dataSource: NetworkDataSource
 ) : ProductsRepository {
-    override fun getProducts(): Single<List<Product>> {
-        return dataSource.getProducts(0, 20)
+    override fun getProducts(
+        skip: Int
+    ): Single<List<Product>> {
+        return dataSource.getProducts(skip)
             .map { response -> response.toModel() }
             .onErrorResumeNext { throwable: Throwable ->
                 if (throwable is IOException) {

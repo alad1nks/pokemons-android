@@ -50,6 +50,6 @@ class RetrofitNetwork @Inject constructor(
         .build()
         .create(RetrofitNetworkApi::class.java)
 
-    override fun getProducts(skip: Int, limit: Int): Single<ProductsResponse> =
-        networkApi.getProducts(skip, limit)
+    override fun getProducts(skip: Int): Single<ProductsResponse> =
+        networkApi.getProducts(skip, 20)
 }

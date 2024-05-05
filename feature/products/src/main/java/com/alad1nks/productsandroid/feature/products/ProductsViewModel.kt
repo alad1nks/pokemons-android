@@ -8,6 +8,7 @@ import com.alad1nks.productsandroid.core.model.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.schedulers.Schedulers
 import io.reactivex.rxjava3.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,15 +35,28 @@ class ProductsViewModel @Inject constructor(
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { items -> _uiState.value = ProductsUiState.Data(items) },
-                    { error -> _uiState.value = ProductsUiState.Error }
+                    { _ -> _uiState.value = ProductsUiState.Error }
                 )
         )
         searchQuerySubject.onNext("")
     }
 
-
-    fun updateSearchQuery(query: String) {
-        searchQuerySubject.onNext(query)
+    fun loadMore(skip: Int) {
+        disposables.add(
+            repository.getProducts(skip)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                    { items ->
+                        val products = when (val state = uiState.value) {
+                            is ProductsUiState.Data -> state.products + items
+                            else -> items
+                        }
+                        _uiState.value = ProductsUiState.Data(products)
+                    },
+                    { _ -> _uiState.value = ProductsUiState.Error }
+                )
+        )
     }
 
     override fun onCleared() {

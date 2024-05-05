@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="navigation_icon">Navigation icon</string>
+    <string name="search_icon">Search icon</string>
+    <string name="more_icon">More icon</string>
+</resources>

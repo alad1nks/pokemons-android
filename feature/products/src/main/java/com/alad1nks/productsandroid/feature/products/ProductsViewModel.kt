@@ -25,10 +25,12 @@ class ProductsViewModel @Inject constructor(
 ) : ViewModel() {
     private val disposables = CompositeDisposable()
 
-    private val searchQuerySubject = PublishSubject.create<String>()
-
     private val _uiState: MutableLiveData<ProductsUiState> = MutableLiveData()
     val uiState: LiveData<ProductsUiState> = _uiState
+
+    private val _searchQuery = MutableLiveData("")
+    val searchQuery: LiveData<String> get() = _searchQuery
+    private val searchQuerySubject = PublishSubject.create<String>()
 
     val darkTheme: Flow<Boolean> = userDataRepository.userData.map { it.darkTheme }
 
@@ -38,7 +40,7 @@ class ProductsViewModel @Inject constructor(
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .distinctUntilChanged()
                 .switchMapSingle { query ->
-                    repository.getProducts()
+                    repository.getProducts(query)
                 }
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -49,9 +51,10 @@ class ProductsViewModel @Inject constructor(
         refresh()
     }
 
-    fun loadMore(skip: Int) {
+    fun refresh() {
+        _uiState.value = ProductsUiState.Loading
         disposables.add(
-            repository.getProducts(skip)
+            repository.getProducts(searchQuery.value ?: "")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
@@ -67,10 +70,14 @@ class ProductsViewModel @Inject constructor(
         )
     }
 
-    fun refresh() {
-        _uiState.value = ProductsUiState.Loading
+    fun search(query: String) {
+        _searchQuery.value = query
+        searchQuerySubject.onNext(query)
+    }
+
+    fun loadMore(skip: Int) {
         disposables.add(
-            repository.getProducts()
+            repository.getProducts(searchQuery.value ?: "", skip)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(

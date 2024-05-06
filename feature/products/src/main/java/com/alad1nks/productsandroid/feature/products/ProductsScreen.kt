@@ -1,5 +1,10 @@
 package com.alad1nks.productsandroid.feature.products
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandHorizontally
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,24 +49,28 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.alad1nks.productsandroid.core.designsystem.components.SearchBar
 import com.alad1nks.productsandroid.core.model.Product
 
 @Composable
 internal fun ProductsRoute(
     onShowSnackbar: suspend (String, String?) -> Boolean,
-    onClickItem: (Int) -> Unit,
+    onItemClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductsViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.observeAsState(initial = ProductsUiState.Loading)
     val darkTheme by viewModel.darkTheme.collectAsState(initial = false)
+    val searchQuery by viewModel.searchQuery.observeAsState(initial = "")
 
     ProductsScreen(
         darkTheme = darkTheme,
-        onClickThemeIcon = { viewModel.changeTheme() },
-        onClickItem = onClickItem,
+        onThemeIconClick = { viewModel.changeTheme() },
+        searchValue = searchQuery,
+        onSearchValueChange = { viewModel.search(it) },
+        onItemClick = onItemClick,
         onScroll = { viewModel.loadMore(it) },
-        onClickRefresh = { viewModel.refresh() },
+        onRefreshClick = { viewModel.refresh() },
         uiState = uiState,
         modifier = modifier
     )
@@ -67,10 +79,12 @@ internal fun ProductsRoute(
 @Composable
 internal fun ProductsScreen(
     darkTheme: Boolean,
-    onClickThemeIcon: () -> Unit,
-    onClickItem: (Int) -> Unit,
+    onThemeIconClick: () -> Unit,
+    searchValue: String,
+    onSearchValueChange: (String) -> Unit,
+    onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
-    onClickRefresh: () -> Unit,
+    onRefreshClick: () -> Unit,
     uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
@@ -79,7 +93,9 @@ internal fun ProductsScreen(
         topBar = {
             ProductsTopBar(
                 darkTheme = darkTheme,
-                onClickThemeIcon = onClickThemeIcon
+                onThemeIconClick = onThemeIconClick,
+                searchValue = searchValue,
+                onSearchValueChange = onSearchValueChange
             )
         }
     ) { padding ->
@@ -87,19 +103,21 @@ internal fun ProductsScreen(
             is ProductsUiState.Data -> {
                 ProductList(
                     products = uiState.products,
-                    onClickItem = onClickItem,
+                    onClickItem = onItemClick,
                     onScroll = onScroll,
                     modifier = Modifier
                         .padding(padding)
                 )
             }
+
             ProductsUiState.Loading -> {
 
             }
+
             ProductsUiState.Error -> {
                 ProductsErrorScreen(
                     darkTheme = darkTheme,
-                    onClick = onClickRefresh,
+                    onClick = onRefreshClick,
                     modifier = Modifier
                         .padding(padding)
                         .fillMaxSize()
@@ -113,16 +131,37 @@ internal fun ProductsScreen(
 @Composable
 internal fun ProductsTopBar(
     darkTheme: Boolean,
-    onClickThemeIcon: () -> Unit,
+    onThemeIconClick: () -> Unit,
+    searchValue: String,
+    onSearchValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var showSearchBar by remember { mutableStateOf(searchValue.isNotEmpty()) }
+
     TopAppBar(
         title = {
-            Text(stringResource(R.string.products))
+            if (!showSearchBar) {
+                Text(stringResource(R.string.products))
+            }
+
+            AnimatedVisibility(
+                visible = showSearchBar,
+                enter = fadeIn() + expandHorizontally(),
+                exit = fadeOut() + shrinkHorizontally()
+            ) {
+                SearchBar(
+                    value = searchValue,
+                    onValueChange = onSearchValueChange,
+                    onSearchClose = {
+                        onSearchValueChange("")
+                        showSearchBar = false
+                    }
+                )
+            }
         },
         modifier = modifier,
         navigationIcon = {
-            IconButton(onClick = onClickThemeIcon) {
+            IconButton(onClick = onThemeIconClick) {
                 Icon(
                     imageVector = if (darkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
                     contentDescription = stringResource(R.string.icon_app_theme)
@@ -130,11 +169,17 @@ internal fun ProductsTopBar(
             }
         },
         actions = {
-            IconButton(onClick = {  }) {
-                Icon(
-                    imageVector = Icons.Filled.Search,
-                    contentDescription = stringResource(R.string.search_icon)
-                )
+            AnimatedVisibility(
+                visible = !showSearchBar,
+                enter = fadeIn() + expandHorizontally(),
+                exit = fadeOut() + shrinkHorizontally()
+            ) {
+                IconButton(onClick = { showSearchBar = true }) {
+                    Icon(
+                        imageVector = Icons.Filled.Search,
+                        contentDescription = stringResource(R.string.search_icon)
+                    )
+                }
             }
             IconButton(onClick = {  }) {
                 Icon(

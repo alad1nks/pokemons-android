@@ -11,9 +11,11 @@ class ProductsRepositoryImpl @Inject constructor(
     private val dataSource: NetworkDataSource
 ) : ProductsRepository {
     override fun getProducts(
-        skip: Int
+        search: String,
+        skip: Int,
+        limit: Int
     ): Single<List<Product>> {
-        return dataSource.getProducts(skip)
+        return dataSource.getProducts(search, skip, limit)
             .map { response -> response.toModel() }
             .onErrorResumeNext { throwable: Throwable ->
                 if (throwable is IOException) {

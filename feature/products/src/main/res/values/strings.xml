@@ -7,4 +7,6 @@
     <string name="network_error_image">Network error image</string>
     <string name="try_again">Try again</string>
     <string name="icon_app_theme">Icon according to app theme</string>
+    <string name="search">Search</string>
+    <string name="description_close_search">Close search</string>
 </resources>

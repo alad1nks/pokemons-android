@@ -19,8 +19,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private interface RetrofitNetworkApi {
-    @GET("products")
+    @GET("products/search")
     fun getProducts(
+        @Query("q") q: String,
         @Query("skip") skip: Int,
         @Query("limit") limit: Int
     ): Single<ProductsResponse>
@@ -37,7 +38,6 @@ private const val BASE_URL = "https://dummyjson.com/"
 class RetrofitNetwork @Inject constructor(
     networkJson: Json
 ) : NetworkDataSource {
-
     private val client = OkHttpClient.Builder().addInterceptor { chain ->
         val requestBuilder = chain.request().newBuilder()
         val response = chain.proceed(requestBuilder.build())
@@ -57,8 +57,8 @@ class RetrofitNetwork @Inject constructor(
         .build()
         .create(RetrofitNetworkApi::class.java)
 
-    override fun getProducts(skip: Int): Single<ProductsResponse> =
-        networkApi.getProducts(skip, 20)
+    override fun getProducts(search: String, skip: Int, limit: Int): Single<ProductsResponse> =
+        networkApi.getProducts(search, skip, limit)
 
     override fun getProduct(id: Int): Single<ProductResponse> =
         networkApi.getProduct(id)

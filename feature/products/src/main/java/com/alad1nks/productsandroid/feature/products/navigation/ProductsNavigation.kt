@@ -13,7 +13,7 @@ fun NavGraphBuilder.productsScreen(
     composable(PRODUCTS_ROUTE) {
         ProductsRoute(
             onShowSnackbar = onShowSnackbar,
-            onClickItem = onClickItem
+            onItemClick = onClickItem
         )
     }
 }

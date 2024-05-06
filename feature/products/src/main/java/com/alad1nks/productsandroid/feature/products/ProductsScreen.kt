@@ -9,6 +9,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -31,7 +32,10 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
@@ -42,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -63,32 +68,53 @@ internal fun ProductsRoute(
     val uiState by viewModel.uiState.observeAsState(initial = ProductsUiState.Loading)
     val darkTheme by viewModel.darkTheme.collectAsState(initial = false)
     val searchQuery by viewModel.searchQuery.observeAsState(initial = "")
+    val shouldEndRefresh by viewModel.shouldEndRefresh.observeAsState(initial = false)
 
     ProductsScreen(
-        darkTheme = darkTheme,
+        onSwipe = { viewModel.refresh(true) },
+        shouldEndRefresh = shouldEndRefresh,
+        onRefreshEnded = { viewModel.onRefreshEnded() },
         onThemeIconClick = { viewModel.changeTheme() },
         searchValue = searchQuery,
         onSearchValueChange = { viewModel.search(it) },
+        uiState = uiState,
         onItemClick = onItemClick,
         onScroll = { viewModel.loadMore(it) },
+        darkTheme = darkTheme,
         onRefreshClick = { viewModel.refresh() },
-        uiState = uiState,
         modifier = modifier
     )
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProductsScreen(
-    darkTheme: Boolean,
+    onSwipe: () -> Unit,
+    shouldEndRefresh: Boolean,
+    onRefreshEnded: () -> Unit,
     onThemeIconClick: () -> Unit,
     searchValue: String,
     onSearchValueChange: (String) -> Unit,
+    uiState: ProductsUiState,
     onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
+    darkTheme: Boolean,
     onRefreshClick: () -> Unit,
-    uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
+    val refreshState = rememberPullToRefreshState()
+    if (refreshState.isRefreshing) {
+        LaunchedEffect(true) {
+            onSwipe()
+        }
+    }
+    if (shouldEndRefresh) {
+        LaunchedEffect(true) {
+            onRefreshEnded()
+            refreshState.endRefresh()
+        }
+    }
+
     Scaffold(
         modifier = modifier,
         topBar = {
@@ -100,16 +126,26 @@ internal fun ProductsScreen(
             )
         }
     ) { padding ->
-        ProductsContent(
-            darkTheme = darkTheme,
-            onItemClick = onItemClick,
-            onScroll = onScroll,
-            onRefreshClick = onRefreshClick,
-            uiState = uiState,
+        Box(
             modifier = Modifier
+                .nestedScroll(refreshState.nestedScrollConnection)
                 .padding(padding)
-                .fillMaxSize()
-        )
+        ) {
+            ProductsContent(
+                uiState = uiState,
+                onItemClick = onItemClick,
+                onScroll = onScroll,
+                darkTheme = darkTheme,
+                onRefreshClick = onRefreshClick,
+                modifier = Modifier
+                    .fillMaxSize()
+            )
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter),
+                state = refreshState
+            )
+        }
     }
 }
 
@@ -183,11 +219,11 @@ internal fun ProductsTopBar(
 
 @Composable
 internal fun ProductsContent(
-    darkTheme: Boolean,
+    uiState: ProductsUiState,
     onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
+    darkTheme: Boolean,
     onRefreshClick: () -> Unit,
-    uiState: ProductsUiState,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -235,9 +271,8 @@ internal fun ProductsData(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                modifier = Modifier.clickable {
-                    onClickItem(product.id)
-                },
+                modifier = Modifier
+                    .clickable { onClickItem(product.id) },
                 supportingContent = {
                     Text(
                         text = product.description,

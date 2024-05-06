@@ -32,6 +32,9 @@ class ProductsViewModel @Inject constructor(
     val searchQuery: LiveData<String> get() = _searchQuery
     private val searchQuerySubject = PublishSubject.create<String>()
 
+    private val _shouldEndRefresh = MutableLiveData(false)
+    val shouldEndRefresh: LiveData<Boolean> get() = _shouldEndRefresh
+
     val darkTheme: Flow<Boolean> = userDataRepository.userData.map { it.darkTheme }
 
     init {
@@ -51,7 +54,7 @@ class ProductsViewModel @Inject constructor(
         refresh()
     }
 
-    fun refresh() {
+    fun refresh(swipe: Boolean = false) {
         _uiState.value = ProductsUiState.Loading
         disposables.add(
             repository.getProducts(searchQuery.value ?: "")
@@ -64,8 +67,12 @@ class ProductsViewModel @Inject constructor(
                             else -> items
                         }
                         _uiState.value = ProductsUiState.Data(products)
+                        if (swipe) { _shouldEndRefresh.value = true }
                     },
-                    { _ -> _uiState.value = ProductsUiState.Error }
+                    { _ ->
+                        _uiState.value = ProductsUiState.Error
+                        if (swipe) { _shouldEndRefresh.value = true }
+                    }
                 )
         )
     }
@@ -97,6 +104,10 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             userDataRepository.changeTheme()
         }
+    }
+
+    fun onRefreshEnded() {
+        _shouldEndRefresh.value = false
     }
 
     override fun onCleared() {

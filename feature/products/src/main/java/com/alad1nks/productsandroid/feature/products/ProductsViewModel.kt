@@ -46,7 +46,7 @@ class ProductsViewModel @Inject constructor(
                     { _ -> _uiState.value = ProductsUiState.Error }
                 )
         )
-        searchQuerySubject.onNext("")
+        refresh()
     }
 
     fun loadMore(skip: Int) {

@@ -23,10 +23,14 @@ fun NavHost(
     ) {
         productsScreen(
             onShowSnackbar = onShowSnackbar,
-            onClickItem = {
-                navController.navigate(PRODUCT_ROUTE)
+            onClickItem = { id ->
+                navController.navigate(PRODUCT_ROUTE.replace("{id}", id.toString()))
             }
         )
-        productScreen(onShowSnackbar)
+        productScreen(
+            onClickBackButton = {
+                navController.popBackStack()
+            }
+        )
     }
 }

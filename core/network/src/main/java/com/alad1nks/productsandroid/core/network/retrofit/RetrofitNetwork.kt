@@ -1,6 +1,7 @@
 package com.alad1nks.productsandroid.core.network.retrofit
 
 import com.alad1nks.productsandroid.core.network.NetworkDataSource
+import com.alad1nks.productsandroid.core.network.model.ProductResponse
 import com.alad1nks.productsandroid.core.network.model.ProductsResponse
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.reactivex.rxjava3.core.Single
@@ -11,6 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory
 import retrofit2.http.GET
+import retrofit2.http.Path
 import retrofit2.http.Query
 import java.io.IOException
 import javax.inject.Inject
@@ -22,6 +24,11 @@ private interface RetrofitNetworkApi {
         @Query("skip") skip: Int,
         @Query("limit") limit: Int
     ): Single<ProductsResponse>
+
+    @GET("products/{id}")
+    fun getProduct(
+        @Path("id") id: Int
+    ): Single<ProductResponse>
 }
 
 private const val BASE_URL = "https://dummyjson.com/"
@@ -52,4 +59,7 @@ class RetrofitNetwork @Inject constructor(
 
     override fun getProducts(skip: Int): Single<ProductsResponse> =
         networkApi.getProducts(skip, 20)
+
+    override fun getProduct(id: Int): Single<ProductResponse> =
+        networkApi.getProduct(id)
 }

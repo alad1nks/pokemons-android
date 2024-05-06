@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="icon_navigate_back">Icon navigate back</string>
+    <string name="placeholder_product">Product</string>
+    <string name="description">Description</string>
+</resources>

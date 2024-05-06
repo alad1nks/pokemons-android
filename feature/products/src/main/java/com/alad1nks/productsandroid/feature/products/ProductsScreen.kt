@@ -49,6 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.alad1nks.productsandroid.core.designsystem.components.AnimatedShimmerListItem
 import com.alad1nks.productsandroid.core.designsystem.components.SearchBar
 import com.alad1nks.productsandroid.core.model.Product
 
@@ -99,31 +100,16 @@ internal fun ProductsScreen(
             )
         }
     ) { padding ->
-        when (uiState) {
-            is ProductsUiState.Data -> {
-                ProductList(
-                    products = uiState.products,
-                    onClickItem = onItemClick,
-                    onScroll = onScroll,
-                    modifier = Modifier
-                        .padding(padding)
-                )
-            }
-
-            ProductsUiState.Loading -> {
-
-            }
-
-            ProductsUiState.Error -> {
-                ProductsErrorScreen(
-                    darkTheme = darkTheme,
-                    onClick = onRefreshClick,
-                    modifier = Modifier
-                        .padding(padding)
-                        .fillMaxSize()
-                )
-            }
-        }
+        ProductsContent(
+            darkTheme = darkTheme,
+            onItemClick = onItemClick,
+            onScroll = onScroll,
+            onRefreshClick = onRefreshClick,
+            uiState = uiState,
+            modifier = Modifier
+                .padding(padding)
+                .fillMaxSize()
+        )
     }
 }
 
@@ -196,7 +182,42 @@ internal fun ProductsTopBar(
 }
 
 @Composable
-internal fun ProductList(
+internal fun ProductsContent(
+    darkTheme: Boolean,
+    onItemClick: (Int) -> Unit,
+    onScroll: (Int) -> Unit,
+    onRefreshClick: () -> Unit,
+    uiState: ProductsUiState,
+    modifier: Modifier = Modifier
+) {
+    when (uiState) {
+        is ProductsUiState.Data -> {
+            ProductsData(
+                products = uiState.products,
+                onClickItem = onItemClick,
+                onScroll = onScroll,
+                modifier = modifier
+            )
+        }
+
+        ProductsUiState.Loading -> {
+            ProductsLoading(
+                modifier = modifier
+            )
+        }
+
+        ProductsUiState.Error -> {
+            ProductsError(
+                darkTheme = darkTheme,
+                onClick = onRefreshClick,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+internal fun ProductsData(
     products: List<Product>,
     onClickItem: (Int) -> Unit,
     onScroll: (Int) -> Unit,
@@ -224,7 +245,12 @@ internal fun ProductList(
                         overflow = TextOverflow.Ellipsis
                     )
                 },
-                trailingContent = { Text(product.price.toString()) },
+                trailingContent = {
+                    Text(
+                        text = "\$${product.price}",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                },
                 leadingContent = {
                     AsyncImage(
                         model = product.thumbnail,
@@ -244,7 +270,20 @@ internal fun ProductList(
 }
 
 @Composable
-internal fun ProductsErrorScreen(
+internal fun ProductsLoading(
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier
+    ) {
+        items(20) {
+            AnimatedShimmerListItem()
+        }
+    }
+}
+
+@Composable
+internal fun ProductsError(
     darkTheme: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier

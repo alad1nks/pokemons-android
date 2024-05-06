@@ -67,7 +67,7 @@ class ProductsViewModel @Inject constructor(
         )
     }
 
-    fun load() {
+    fun refresh() {
         _uiState.value = ProductsUiState.Loading
         disposables.add(
             repository.getProducts()

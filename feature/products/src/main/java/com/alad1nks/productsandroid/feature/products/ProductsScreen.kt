@@ -58,7 +58,7 @@ internal fun ProductsRoute(
         onClickThemeIcon = { viewModel.changeTheme() },
         onClickItem = onClickItem,
         onScroll = { viewModel.loadMore(it) },
-        onClickRefresh = { viewModel.load() },
+        onClickRefresh = { viewModel.refresh() },
         uiState = uiState,
         modifier = modifier
     )

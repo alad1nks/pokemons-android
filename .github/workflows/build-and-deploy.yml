@@ -34,10 +34,18 @@ jobs:
   post-build:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Checkout io repository
+        uses: actions/checkout@v2
+        with:
+          repository: 'alad1nks/alad1nks.github.io'
+          token: ${{ secrets.ACCESS_TOKEN }}
 
       - name: Download APK
         uses: actions/download-artifact@v2

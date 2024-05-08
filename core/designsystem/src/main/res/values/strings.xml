@@ -4,4 +4,6 @@
     <string name="description_close_search">Close search</string>
     <string name="infinite_transition">InfiniteTransition</string>
     <string name="float_animation">FloatAnimation</string>
+    <string name="image_error">Image Error</string>
+    <string name="try_again">Try again</string>
 </resources>

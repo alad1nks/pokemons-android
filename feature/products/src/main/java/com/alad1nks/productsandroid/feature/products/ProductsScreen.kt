@@ -5,12 +5,8 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -22,7 +18,6 @@ import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -45,16 +40,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.alad1nks.productsandroid.core.designsystem.components.AnimatedShimmerListItem
+import com.alad1nks.productsandroid.core.designsystem.components.ErrorScreen
 import com.alad1nks.productsandroid.core.designsystem.components.SearchBar
 import com.alad1nks.productsandroid.core.model.Product
 
@@ -81,7 +75,7 @@ internal fun ProductsRoute(
         onItemClick = onItemClick,
         onScroll = { viewModel.loadMore(it) },
         darkTheme = darkTheme,
-        onRefreshClick = { viewModel.refresh() },
+        onTryAgainClick = { viewModel.refresh() },
         modifier = modifier
     )
 }
@@ -99,7 +93,7 @@ internal fun ProductsScreen(
     onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
     darkTheme: Boolean,
-    onRefreshClick: () -> Unit,
+    onTryAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val refreshState = rememberPullToRefreshState()
@@ -135,8 +129,7 @@ internal fun ProductsScreen(
                 uiState = uiState,
                 onItemClick = onItemClick,
                 onScroll = onScroll,
-                darkTheme = darkTheme,
-                onRefreshClick = onRefreshClick,
+                onTryAgainClick = onTryAgainClick,
                 modifier = Modifier
                     .fillMaxSize()
             )
@@ -222,8 +215,7 @@ internal fun ProductsContent(
     uiState: ProductsUiState,
     onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
-    darkTheme: Boolean,
-    onRefreshClick: () -> Unit,
+    onTryAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -244,8 +236,7 @@ internal fun ProductsContent(
 
         ProductsUiState.Error -> {
             ProductsError(
-                darkTheme = darkTheme,
-                onClick = onRefreshClick,
+                onTryAgainClick = onTryAgainClick,
                 modifier = modifier
             )
         }
@@ -319,29 +310,11 @@ internal fun ProductsLoading(
 
 @Composable
 internal fun ProductsError(
-    darkTheme: Boolean,
-    onClick: () -> Unit,
+    onTryAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val imageRes = if (darkTheme) {
-        R.drawable.network_error_dark
-    } else {
-        R.drawable.network_error
-    }
-    val background = if (darkTheme) Color.Black else Color.White
-    Column(
+    ErrorScreen(
+        onTryAgainClick = onTryAgainClick,
         modifier = modifier
-            .background(background),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Image(
-            painter = painterResource(imageRes),
-            contentDescription = stringResource(R.string.network_error_image)
-        )
-        Button(
-            onClick = onClick,
-            content = { Text(stringResource(R.string.try_again)) }
-        )
-    }
+    )
 }

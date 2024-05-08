@@ -27,9 +27,7 @@ class ProductViewModel @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                    { product ->
-                        _uiState.value = ProductUiState.Data(product)
-                    },
+                    { product -> _uiState.value = ProductUiState.Data(product) },
                     { _ -> _uiState.value = ProductUiState.Error }
                 )
         )

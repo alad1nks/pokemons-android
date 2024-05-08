@@ -36,12 +36,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.alad1nks.productsandroid.core.designsystem.components.ErrorScreen
 import com.alad1nks.productsandroid.core.model.ProductInfo
 
 @Composable
 internal fun ProductRoute(
     id: Int,
-    onClickBackButton: () -> Unit,
+    onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ProductViewModel = hiltViewModel()
 ) {
@@ -51,7 +52,8 @@ internal fun ProductRoute(
     }
     ProductScreen(
         uiState = uiState,
-        onClickBackButton = onClickBackButton,
+        onBackButtonClick = onBackButtonClick,
+        onTryAgainClick = { viewModel.refresh(id) },
         modifier = modifier
     )
 }
@@ -59,19 +61,21 @@ internal fun ProductRoute(
 @Composable
 internal fun ProductScreen(
     uiState: ProductUiState,
-    onClickBackButton: () -> Unit,
+    onBackButtonClick: () -> Unit,
+    onTryAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
         modifier = modifier,
         topBar = {
             ProductTopBar(
-                onClickBackButton = onClickBackButton
+                onBackButtonClick = onBackButtonClick
             )
         }
     ) { padding ->
         ProductContent(
             uiState = uiState,
+            onTryAgainClick = onTryAgainClick,
             modifier = Modifier
                 .padding(padding)
                 .fillMaxSize()
@@ -82,7 +86,7 @@ internal fun ProductScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ProductTopBar(
-    onClickBackButton: () -> Unit,
+    onBackButtonClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var clicked by remember { mutableStateOf(false) }
@@ -96,7 +100,7 @@ internal fun ProductTopBar(
                 onClick = {
                     if (!clicked) {
                         clicked = true
-                        onClickBackButton()
+                        onBackButtonClick()
                     }
                 }
             ) {
@@ -112,6 +116,7 @@ internal fun ProductTopBar(
 @Composable
 internal fun ProductContent(
     uiState: ProductUiState,
+    onTryAgainClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -129,7 +134,10 @@ internal fun ProductContent(
         }
 
         ProductUiState.Error -> {
-
+            ProductError(
+                onTryAgainClick = onTryAgainClick,
+                modifier = modifier
+            )
         }
     }
 }
@@ -195,6 +203,17 @@ internal fun ProductLoading(
     ) {
         CircularProgressIndicator()
     }
+}
+
+@Composable
+internal fun ProductError(
+    onTryAgainClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ErrorScreen(
+        onTryAgainClick = onTryAgainClick,
+        modifier = modifier
+    )
 }
 
 @Composable

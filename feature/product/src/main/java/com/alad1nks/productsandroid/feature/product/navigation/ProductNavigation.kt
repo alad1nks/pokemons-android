@@ -18,7 +18,7 @@ fun NavGraphBuilder.productScreen(
     ) {backStackEntry ->
         ProductRoute(
             id = backStackEntry.arguments?.getInt("id") ?: 0,
-            onClickBackButton = onClickBackButton
+            onBackButtonClick = onClickBackButton
         )
     }
 }

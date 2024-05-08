@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
 }
 
+apply(plugin = "app.cash.paparazzi")
+
 android {
     namespace = "com.alad1nks.productsandroid.core.designsystem"
     compileSdk = 34

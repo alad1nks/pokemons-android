@@ -90,7 +90,7 @@ internal fun ProductTopBar(
     var clicked by remember { mutableStateOf(false) }
     TopAppBar(
         title = {
-            Text(stringResource(R.string.placeholder_product))
+            Text(stringResource(R.string.placeholder_pokemon))
         },
         modifier = modifier,
         navigationIcon = {

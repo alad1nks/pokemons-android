@@ -127,7 +127,7 @@ internal fun ProductsTopBar(
 ) {
     TopAppBar(
         title = {
-            Text(stringResource(R.string.products))
+            Text(stringResource(R.string.pokemons_title))
         },
         modifier = modifier,
         navigationIcon = {

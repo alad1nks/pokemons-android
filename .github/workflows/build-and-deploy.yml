@@ -22,7 +22,7 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x ./gradlew
 
-      - name: Build Release APK
+      - name: Build Debug APK
         run: ./gradlew assembleDebug
 
       - name: Rename APK
@@ -31,7 +31,7 @@ jobs:
       - name: Upload APK to GitHub
         uses: actions/upload-artifact@v2
         with:
-          name: app-release
+          name: debug
           path: app/build/outputs/apk/debug/pokemons.apk
 
   post-build:
@@ -53,7 +53,7 @@ jobs:
       - name: Download APK
         uses: actions/download-artifact@v2
         with:
-          name: app-release
+          name: debug
           path: pokemons
 
       - name: Commit APK

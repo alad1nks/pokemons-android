@@ -6,16 +6,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.alad1nks.productsandroid.core.data.repository.ProductsRepository
 import com.alad1nks.productsandroid.core.data.repository.UserDataRepository
-import com.alad1nks.productsandroid.core.model.Product
+import com.alad1nks.productsandroid.core.model.Pokemon
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
 import io.reactivex.rxjava3.schedulers.Schedulers
-import io.reactivex.rxjava3.subjects.PublishSubject
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,42 +26,25 @@ class ProductsViewModel @Inject constructor(
     private val _uiState: MutableLiveData<ProductsUiState> = MutableLiveData()
     val uiState: LiveData<ProductsUiState> = _uiState
 
-    private val _searchQuery = MutableLiveData("")
-    val searchQuery: LiveData<String> get() = _searchQuery
-    private val searchQuerySubject = PublishSubject.create<String>()
-
     private val _shouldEndRefresh = MutableLiveData(false)
     val shouldEndRefresh: LiveData<Boolean> get() = _shouldEndRefresh
 
     val darkTheme: Flow<Boolean> = userDataRepository.userData.map { it.darkTheme }
 
     init {
-        disposables.add(
-            searchQuerySubject
-                .debounce(300, TimeUnit.MILLISECONDS)
-                .distinctUntilChanged()
-                .switchMapSingle { query ->
-                    repository.getProducts(query)
-                }
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(
-                    { items -> _uiState.value = ProductsUiState.Data(items) },
-                    { _ -> _uiState.value = ProductsUiState.Error }
-                )
-        )
         refresh()
     }
 
     fun refresh(swipe: Boolean = false) {
         _uiState.value = ProductsUiState.Loading
         disposables.add(
-            repository.getProducts(searchQuery.value ?: "")
+            repository.getProducts()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { items ->
                         val products = when (val state = uiState.value) {
-                            is ProductsUiState.Data -> state.products + items
+                            is ProductsUiState.Data -> state.pokemons + items
                             else -> items
                         }
                         _uiState.value = ProductsUiState.Data(products)
@@ -77,20 +58,15 @@ class ProductsViewModel @Inject constructor(
         )
     }
 
-    fun search(query: String) {
-        _searchQuery.value = query
-        searchQuerySubject.onNext(query)
-    }
-
     fun loadMore(skip: Int) {
         disposables.add(
-            repository.getProducts(searchQuery.value ?: "", skip)
+            repository.getProducts(skip)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(
                     { items ->
                         val products = when (val state = uiState.value) {
-                            is ProductsUiState.Data -> state.products + items
+                            is ProductsUiState.Data -> state.pokemons + items
                             else -> items
                         }
                         _uiState.value = ProductsUiState.Data(products)
@@ -120,7 +96,7 @@ sealed interface ProductsUiState {
     data object Loading : ProductsUiState
 
     data class Data(
-        val products: List<Product>
+        val pokemons: List<Pokemon>
     ) : ProductsUiState
 
     data object Error : ProductsUiState

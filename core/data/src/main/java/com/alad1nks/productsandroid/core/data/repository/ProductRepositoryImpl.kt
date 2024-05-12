@@ -1,8 +1,8 @@
 package com.alad1nks.productsandroid.core.data.repository
 
-import com.alad1nks.productsandroid.core.model.ProductInfo
+import com.alad1nks.productsandroid.core.model.PokemonInfo
 import com.alad1nks.productsandroid.core.network.NetworkDataSource
-import com.alad1nks.productsandroid.core.network.model.ProductResponse
+import com.alad1nks.productsandroid.core.network.model.PokemonInfoResponse
 import io.reactivex.rxjava3.core.Single
 import java.io.IOException
 import javax.inject.Inject
@@ -10,8 +10,8 @@ import javax.inject.Inject
 class ProductRepositoryImpl @Inject constructor(
     private val dataSource: NetworkDataSource
 ) : ProductRepository {
-    override fun getProduct(id: Int): Single<ProductInfo> {
-        return dataSource.getProduct(id)
+    override fun getProduct(id: Int): Single<PokemonInfo> {
+        return dataSource.getPokemon(id)
             .map { response -> response.toModel() }
             .onErrorResumeNext { throwable: Throwable ->
                 if (throwable is IOException) {
@@ -22,18 +22,14 @@ class ProductRepositoryImpl @Inject constructor(
             }
     }
 
-    private fun ProductResponse.toModel(): ProductInfo {
-        return ProductInfo(
-            title = title,
-            description = description,
-            price = price,
-            discountPercentage = discountPercentage,
-            rating = rating,
-            stock = stock,
-            brand = brand,
-            category = category,
-            thumbnail = thumbnail,
-            images = images
+    private fun PokemonInfoResponse.toModel(): PokemonInfo {
+        return PokemonInfo(
+            name = name,
+            sprites = with(sprites) {
+                listOf(frontDefault, frontShiny, backDefault, backShiny)
+            },
+            weight = weight,
+            height = height
         )
     }
 }

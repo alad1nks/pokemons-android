@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -33,11 +32,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.alad1nks.productsandroid.core.designsystem.components.ErrorScreen
-import com.alad1nks.productsandroid.core.model.ProductInfo
+import com.alad1nks.productsandroid.core.model.PokemonInfo
 
 @Composable
 internal fun ProductRoute(
@@ -122,7 +120,7 @@ internal fun ProductContent(
     when (uiState) {
         is ProductUiState.Data -> {
             ProductData(
-                product = uiState.product,
+                pokemon = uiState.product,
                 modifier = modifier
             )
         }
@@ -144,7 +142,7 @@ internal fun ProductContent(
 
 @Composable
 internal fun ProductData(
-    product: ProductInfo,
+    pokemon: PokemonInfo,
     modifier: Modifier = Modifier
 ) {
     LazyColumn(
@@ -152,7 +150,7 @@ internal fun ProductData(
     ) {
         item {
             ProductImages(
-                images = product.images,
+                images = pokemon.sprites,
                 modifier = Modifier
                     .fillMaxWidth()
             )
@@ -162,29 +160,15 @@ internal fun ProductData(
                 modifier = Modifier
                     .padding(16.dp)
             ) {
-                Text(
-                    text = stringResource(R.string.description),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(product.description)
-                Spacer(modifier = Modifier.height(8.dp))
                 ProductCharacteristic(
-                    parameter = "Category",
-                    value = product.category,
+                    parameter = "Height",
+                    value = pokemon.height,
                     modifier = Modifier
                         .fillMaxWidth()
                 )
                 ProductCharacteristic(
-                    parameter = "Brand",
-                    value = product.brand,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                )
-                ProductCharacteristic(
-                    parameter = "Stock",
-                    value = product.stock.toString(),
+                    parameter = "Weight",
+                    value = pokemon.weight,
                     modifier = Modifier
                         .fillMaxWidth()
                 )

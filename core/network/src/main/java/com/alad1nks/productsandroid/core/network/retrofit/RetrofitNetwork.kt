@@ -1,8 +1,8 @@
 package com.alad1nks.productsandroid.core.network.retrofit
 
 import com.alad1nks.productsandroid.core.network.NetworkDataSource
-import com.alad1nks.productsandroid.core.network.model.ProductResponse
-import com.alad1nks.productsandroid.core.network.model.ProductsResponse
+import com.alad1nks.productsandroid.core.network.model.PokemonInfoResponse
+import com.alad1nks.productsandroid.core.network.model.PokemonsResponse
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import io.reactivex.rxjava3.core.Single
 import kotlinx.serialization.json.Json
@@ -19,20 +19,19 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 private interface RetrofitNetworkApi {
-    @GET("products/search")
+    @GET("pokemon")
     fun getProducts(
-        @Query("q") q: String,
         @Query("skip") skip: Int,
         @Query("limit") limit: Int
-    ): Single<ProductsResponse>
+    ): Single<PokemonsResponse>
 
-    @GET("products/{id}")
+    @GET("pokemon/{id}")
     fun getProduct(
         @Path("id") id: Int
-    ): Single<ProductResponse>
+    ): Single<PokemonInfoResponse>
 }
 
-private const val BASE_URL = "https://dummyjson.com/"
+private const val BASE_URL = "https://pokeapi.co/api/v2/"
 
 @Singleton
 class RetrofitNetwork @Inject constructor(
@@ -57,9 +56,9 @@ class RetrofitNetwork @Inject constructor(
         .build()
         .create(RetrofitNetworkApi::class.java)
 
-    override fun getProducts(search: String, skip: Int, limit: Int): Single<ProductsResponse> =
-        networkApi.getProducts(search, skip, limit)
+    override fun getPokemons(skip: Int, limit: Int): Single<PokemonsResponse> =
+        networkApi.getProducts(skip, limit)
 
-    override fun getProduct(id: Int): Single<ProductResponse> =
+    override fun getPokemon(id: Int): Single<PokemonInfoResponse> =
         networkApi.getProduct(id)
 }

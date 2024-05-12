@@ -1,23 +1,14 @@
 package com.alad1nks.productsandroid.feature.products
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.expandHorizontally
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkHorizontally
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,23 +25,15 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import com.alad1nks.productsandroid.core.designsystem.components.AnimatedShimmerListItem
 import com.alad1nks.productsandroid.core.designsystem.components.ErrorScreen
-import com.alad1nks.productsandroid.core.designsystem.components.SearchBar
-import com.alad1nks.productsandroid.core.model.Product
+import com.alad1nks.productsandroid.core.model.Pokemon
 
 @Composable
 internal fun ProductsRoute(
@@ -61,7 +44,6 @@ internal fun ProductsRoute(
 ) {
     val uiState by viewModel.uiState.observeAsState(initial = ProductsUiState.Loading)
     val darkTheme by viewModel.darkTheme.collectAsState(initial = false)
-    val searchQuery by viewModel.searchQuery.observeAsState(initial = "")
     val shouldEndRefresh by viewModel.shouldEndRefresh.observeAsState(initial = false)
 
     ProductsScreen(
@@ -69,8 +51,6 @@ internal fun ProductsRoute(
         shouldEndRefresh = shouldEndRefresh,
         onRefreshEnded = { viewModel.onRefreshEnded() },
         onThemeIconClick = { viewModel.changeTheme() },
-        searchValue = searchQuery,
-        onSearchValueChange = { viewModel.search(it) },
         uiState = uiState,
         onItemClick = onItemClick,
         onScroll = { viewModel.loadMore(it) },
@@ -87,8 +67,6 @@ internal fun ProductsScreen(
     shouldEndRefresh: Boolean,
     onRefreshEnded: () -> Unit,
     onThemeIconClick: () -> Unit,
-    searchValue: String,
-    onSearchValueChange: (String) -> Unit,
     uiState: ProductsUiState,
     onItemClick: (Int) -> Unit,
     onScroll: (Int) -> Unit,
@@ -114,9 +92,7 @@ internal fun ProductsScreen(
         topBar = {
             ProductsTopBar(
                 darkTheme = darkTheme,
-                onThemeIconClick = onThemeIconClick,
-                searchValue = searchValue,
-                onSearchValueChange = onSearchValueChange
+                onThemeIconClick = onThemeIconClick
             )
         }
     ) { padding ->
@@ -147,32 +123,11 @@ internal fun ProductsScreen(
 internal fun ProductsTopBar(
     darkTheme: Boolean,
     onThemeIconClick: () -> Unit,
-    searchValue: String,
-    onSearchValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var showSearchBar by remember { mutableStateOf(searchValue.isNotEmpty()) }
-
     TopAppBar(
         title = {
-            if (!showSearchBar) {
-                Text(stringResource(R.string.products))
-            }
-
-            AnimatedVisibility(
-                visible = showSearchBar,
-                enter = fadeIn() + expandHorizontally(),
-                exit = fadeOut() + shrinkHorizontally()
-            ) {
-                SearchBar(
-                    value = searchValue,
-                    onValueChange = onSearchValueChange,
-                    onSearchClose = {
-                        onSearchValueChange("")
-                        showSearchBar = false
-                    }
-                )
-            }
+            Text(stringResource(R.string.products))
         },
         modifier = modifier,
         navigationIcon = {
@@ -180,26 +135,6 @@ internal fun ProductsTopBar(
                 Icon(
                     imageVector = if (darkTheme) Icons.Filled.DarkMode else Icons.Filled.LightMode,
                     contentDescription = stringResource(R.string.icon_app_theme)
-                )
-            }
-        },
-        actions = {
-            AnimatedVisibility(
-                visible = !showSearchBar,
-                enter = fadeIn() + expandHorizontally(),
-                exit = fadeOut() + shrinkHorizontally()
-            ) {
-                IconButton(onClick = { showSearchBar = true }) {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = stringResource(R.string.search_icon)
-                    )
-                }
-            }
-            IconButton(onClick = {  }) {
-                Icon(
-                    imageVector = Icons.Filled.MoreVert,
-                    contentDescription = stringResource(R.string.more_icon)
                 )
             }
         },
@@ -221,7 +156,7 @@ internal fun ProductsContent(
     when (uiState) {
         is ProductsUiState.Data -> {
             ProductsData(
-                products = uiState.products,
+                pokemons = uiState.pokemons,
                 onClickItem = onItemClick,
                 onScroll = onScroll,
                 modifier = modifier
@@ -245,7 +180,7 @@ internal fun ProductsContent(
 
 @Composable
 internal fun ProductsData(
-    products: List<Product>,
+    pokemons: List<Pokemon>,
     onClickItem: (Int) -> Unit,
     onScroll: (Int) -> Unit,
     modifier: Modifier = Modifier
@@ -253,43 +188,20 @@ internal fun ProductsData(
     LazyColumn(
         modifier = modifier
     ) {
-        itemsIndexed(products) { index, product ->
+        itemsIndexed(pokemons) { index, product ->
             ListItem(
                 headlineContent = {
                     Text(
-                        text = product.title,
+                        text = product.name,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
                 },
                 modifier = Modifier
-                    .clickable { onClickItem(product.id) },
-                supportingContent = {
-                    Text(
-                        text = product.description,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
-                },
-                trailingContent = {
-                    Text(
-                        text = "\$${product.price}",
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                },
-                leadingContent = {
-                    AsyncImage(
-                        model = product.thumbnail,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(60.dp)
-                            .clip(RoundedCornerShape(30)),
-                        contentScale = ContentScale.Crop
-                    )
-                }
+                    .clickable { onClickItem(index + 1) }
             )
-            if (index >= products.size - 1) {
-                onScroll(products.size)
+            if (index >= pokemons.size - 1) {
+                onScroll(pokemons.size)
             }
         }
     }

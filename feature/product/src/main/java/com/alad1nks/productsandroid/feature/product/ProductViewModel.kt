@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.alad1nks.productsandroid.core.data.repository.ProductRepository
-import com.alad1nks.productsandroid.core.model.ProductInfo
+import com.alad1nks.productsandroid.core.model.PokemonInfo
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.disposables.CompositeDisposable
@@ -38,7 +38,7 @@ sealed interface ProductUiState {
     data object Loading : ProductUiState
 
     data class Data(
-        val product: ProductInfo
+        val product: PokemonInfo
     ) : ProductUiState
 
     data object Error : ProductUiState

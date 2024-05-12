@@ -23,16 +23,16 @@ jobs:
         run: chmod +x ./gradlew
 
       - name: Build Release APK
-        run: ./gradlew assembleRelease
+        run: ./gradlew assembleDebug
 
       - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/pokemons.apk
+        run: mv app/build/outputs/apk/debug/app-debug.apk app/build/outputs/apk/debug/pokemons.apk
 
       - name: Upload APK to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: app-release
-          path: app/build/outputs/apk/release/pokemons.apk
+          path: app/build/outputs/apk/debug/pokemons.apk
 
   post-build:
     needs: build

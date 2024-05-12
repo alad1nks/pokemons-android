@@ -6,6 +6,6 @@ import kotlinx.serialization.Serializable
 data class PokemonInfoResponse(
     val name: String,
     val sprites: SpritesResponse,
-    val weight: String,
-    val height: String
+    val weight: Int,
+    val height: Int
 )

@@ -28,8 +28,8 @@ class ProductRepositoryImpl @Inject constructor(
             sprites = with(sprites) {
                 listOf(frontDefault, frontShiny, backDefault, backShiny)
             },
-            weight = weight,
-            height = height
+            weight = weight.toString(),
+            height = height.toString()
         )
     }
 }

@@ -26,13 +26,13 @@ jobs:
         run: ./gradlew assembleRelease
 
       - name: Rename APK
-        run: mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/products-app.apk
+        run: mv app/build/outputs/apk/release/app-release-unsigned.apk app/build/outputs/apk/release/pokemons.apk
 
       - name: Upload APK to GitHub
         uses: actions/upload-artifact@v2
         with:
           name: app-release
-          path: app/build/outputs/apk/release/products-app.apk
+          path: app/build/outputs/apk/release/pokemons.apk
 
   post-build:
     needs: build
@@ -54,12 +54,12 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: app-release
-          path: products-app
+          path: pokemons
 
       - name: Commit APK
         run: |
           git config --local user.name 'alad1nks'
           git config --local user.email 'alad1nks@users.noreply.github.com'
-          git add products-app/*.apk
+          git add pokemons/*.apk
           git commit -m 'Add generated APK file'
           git push
